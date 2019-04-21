@@ -41,9 +41,9 @@ cross-build: deps
 	    done; \
 	done
 
-# .PHONY: deps
-# deps: glide
-# 	glide install
+.PHONY: deps
+deps:
+	dep ensure
 
 .PHONY: bin/$(NAME)
 bin/$(NAME): $(SRCS)
