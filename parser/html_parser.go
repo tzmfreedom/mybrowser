@@ -41,11 +41,11 @@ func (p *HtmlParser) read() byte {
 	return b
 }
 
-func (p *HtmlParser) parseTags() []*Node {
+func (p *HtmlParser) parseTextOrTags() []*Node {
 	tags := []*Node{}
 	for {
 		before := p.pos
-		tag, err := p.parseTag()
+		tag, err := p.parseTextOrTag()
 		if err != nil || tag == nil {
 			p.pos = before
 			break
@@ -53,6 +53,39 @@ func (p *HtmlParser) parseTags() []*Node {
 		tags = append(tags, tag)
 	}
 	return tags
+}
+
+func (p *HtmlParser) parseTextOrTag() (*Node, error) {
+	t, err := p.parseText()
+	if err != nil {
+		return nil, err
+	}
+	if t != nil {
+		return t, nil
+	}
+	t, err = p.parseTag()
+	if err != nil {
+		return nil, err
+	}
+	if t != nil {
+		return t, nil
+	}
+	return nil, errors.New("cannot parse at #parseTextOrTag")
+}
+
+func (p *HtmlParser) parseText() (*Node, error) {
+	text, err := p.parseNotString("<>")
+	if err != nil {
+		return nil, err
+	}
+	if text == "" {
+		 return nil, nil
+	}
+	return &Node{
+		Type: "text",
+		TagName: "",
+		Text: text,
+	}, nil
 }
 
 func (p *HtmlParser) parseTag() (*Node, error) {
@@ -71,7 +104,7 @@ func (p *HtmlParser) parseTag() (*Node, error) {
 	}
 	p.read()
 
-	children := p.parseTags()
+	children := p.parseTextOrTags()
 	if !p.readString("</") {
 		return nil, errors.New("cannot parse")
 	}
@@ -156,6 +189,18 @@ func (p *HtmlParser) parseNotChar(b byte) (string, error) {
 	}
 }
 
+func (p *HtmlParser) parseNotString(src string) (string, error) {
+	l := []byte{}
+	for {
+		c := p.peek()
+		if containsChar(c, src) {
+			return string(l), nil
+		}
+		p.read()
+		l = append(l, c)
+	}
+}
+
 func (p *HtmlParser) consumeSpace() {
 	for p.peek() == ' ' {
 		p.read()
@@ -190,4 +235,13 @@ func isNumeric(b byte) bool {
 
 func isSpace(b byte) bool {
 	return b == ' '
+}
+
+func containsChar(b byte, src string) bool {
+	for _, s := range src {
+		if byte(s) == b {
+			return true
+		}
+	}
+	return false
 }

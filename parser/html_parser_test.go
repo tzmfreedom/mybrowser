@@ -1,10 +1,11 @@
 package parser
 
 import (
+	"fmt"
+	"github.com/k0kubun/pp"
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
-	"github.com/k0kubun/pp"
 )
 
 func TestParse(t *testing.T) {
@@ -98,6 +99,40 @@ func TestParse(t *testing.T) {
 				},
 			},
 		},
+		{
+			"<div>foo<h1>bar</h1>baz</div>",
+			&Node{
+				Type:     "tag",
+				TagName:  "div",
+				Attr:     map[string]string{},
+				Text:     "",
+				Children: []*Node{
+					{
+						Type:     "text",
+						TagName:  "",
+						Text:     "foo",
+					},
+					{
+						Type:     "tag",
+						TagName:  "h1",
+						Attr:     map[string]string{},
+						Text:     "",
+						Children: []*Node{
+							{
+								Type:     "text",
+								TagName:  "",
+								Text:     "bar",
+							},
+						},
+					},
+					{
+						Type:     "text",
+						TagName:  "",
+						Text:     "baz",
+					},
+				},
+			},
+		},
 	}
 	for _, testCase := range testCases {
 		p := NewHtmlParser(testCase.input)
@@ -108,7 +143,7 @@ func TestParse(t *testing.T) {
 		}
 
 		if !cmp.Equal(testCase.expected, actual) {
-			//fmt.Println(cmp.Diff(testCase.expected, actual))
+			fmt.Println(cmp.Diff(testCase.expected, actual))
 			pp.Println(actual)
 			t.Errorf("not much %s", testCase.input)
 		}
