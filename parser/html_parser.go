@@ -79,12 +79,12 @@ func (p *HtmlParser) parseText() (*Node, error) {
 		return nil, err
 	}
 	if text == "" {
-		 return nil, nil
+		return nil, nil
 	}
 	return &Node{
-		Type: "text",
+		Type:    "text",
 		TagName: "",
-		Text: text,
+		Text:    text,
 	}, nil
 }
 

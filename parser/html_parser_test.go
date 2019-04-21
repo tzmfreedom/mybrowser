@@ -2,8 +2,9 @@ package parser
 
 import (
 	"fmt"
-	"github.com/k0kubun/pp"
 	"testing"
+
+	"github.com/k0kubun/pp"
 
 	"github.com/google/go-cmp/cmp"
 )
@@ -102,33 +103,33 @@ func TestParse(t *testing.T) {
 		{
 			"<div>foo<h1>bar</h1>baz</div>",
 			&Node{
-				Type:     "tag",
-				TagName:  "div",
-				Attr:     map[string]string{},
-				Text:     "",
+				Type:    "tag",
+				TagName: "div",
+				Attr:    map[string]string{},
+				Text:    "",
 				Children: []*Node{
 					{
-						Type:     "text",
-						TagName:  "",
-						Text:     "foo",
+						Type:    "text",
+						TagName: "",
+						Text:    "foo",
 					},
 					{
-						Type:     "tag",
-						TagName:  "h1",
-						Attr:     map[string]string{},
-						Text:     "",
+						Type:    "tag",
+						TagName: "h1",
+						Attr:    map[string]string{},
+						Text:    "",
 						Children: []*Node{
 							{
-								Type:     "text",
-								TagName:  "",
-								Text:     "bar",
+								Type:    "text",
+								TagName: "",
+								Text:    "bar",
 							},
 						},
 					},
 					{
-						Type:     "text",
-						TagName:  "",
-						Text:     "baz",
+						Type:    "text",
+						TagName: "",
+						Text:    "baz",
 					},
 				},
 			},
