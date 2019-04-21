@@ -106,7 +106,8 @@ func (p *HtmlParser) parseAttr() (map[string]string, error) {
 			return attr, nil
 		}
 		if p.peek() != '=' {
-			return attr, nil
+			attr[attrKey] = ""
+			continue
 		}
 		p.read()
 		if p.peek() != '"' {

@@ -76,12 +76,13 @@ func TestParse(t *testing.T) {
 			},
 		},
 		{
-			"<html foo=\"bar\"><head hoge=\"fuga\"></head></html>",
+			"<html foo=\"bar\" baz><head hoge=\"fuga\"></head></html>",
 			&Node{
 				Type:    "tag",
 				TagName: "html",
 				Attr: map[string]string{
 					"foo": "bar",
+					"baz": "",
 				},
 				Text: "",
 				Children: []*Node{
