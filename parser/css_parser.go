@@ -166,7 +166,7 @@ func (p *CssParser) parseRules() ([]*Rule, error) {
 			return nil, errors.New("cannot parse selector at parseRules")
 		}
 		read(p)
-		values := strings.Split(value, " ")
+		values := strings.Split(strings.TrimSpace(value), " ")
 
 		rules = append(rules, &Rule{
 			Key:   key,

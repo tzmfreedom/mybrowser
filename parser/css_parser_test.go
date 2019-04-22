@@ -97,6 +97,45 @@ margin: 0 10px 2px 0;
 				},
 			},
 		},
+		{
+			`div{
+  display   : block   ;
+}
+  #foo {
+  
+color: 
+
+red ;
+}`,
+			[]*StyleRule{
+				{
+					Selectors: []*Selector{
+						{
+							Identifier: "div",
+						},
+					},
+					Rules: []*Rule{
+						{
+							Key:   "display",
+							Value: []string{"block"},
+						},
+					},
+				},
+				{
+					Selectors: []*Selector{
+						{
+							Identifier: "#foo",
+						},
+					},
+					Rules: []*Rule{
+						{
+							Key:   "color",
+							Value: []string{"red"},
+						},
+					},
+				},
+			},
+		},
 	}
 	for i, testCase := range testCases {
 		p := NewCssParser(testCase.input)
