@@ -40,34 +40,6 @@ func (p *HtmlParser) Parse() (*Node, error) {
 	return p.parseTag()
 }
 
-func (p *HtmlParser) peek() byte {
-	return peek(p)
-}
-
-func (p *HtmlParser) read() byte {
-	return read(p)
-}
-
-func (p *HtmlParser) parseString() (string, error) {
-	return parseString(p)
-}
-
-func (p *HtmlParser) parseNotChar(b byte) (string, error) {
-	return parseNotChar(p, b)
-}
-
-func (p *HtmlParser) parseNotString(src string) (string, error) {
-	return parseNotString(p, src)
-}
-
-func (p *HtmlParser) consumeSpace() {
-	consumeSpace(p)
-}
-
-func (p *HtmlParser) readString(src string) bool {
-	return readString(p, src)
-}
-
 func (p *HtmlParser) parseTextOrTags() []*Node {
 	tags := []*Node{}
 	for {
@@ -101,7 +73,7 @@ func (p *HtmlParser) parseTextOrTag() (*Node, error) {
 }
 
 func (p *HtmlParser) parseText() (*Node, error) {
-	text, err := p.parseNotString("<>")
+	text, err := parseNotString(p, "<>")
 	if err != nil {
 		return nil, err
 	}
@@ -116,37 +88,37 @@ func (p *HtmlParser) parseText() (*Node, error) {
 }
 
 func (p *HtmlParser) parseTag() (*Node, error) {
-	if p.peek() != '<' {
+	if peek(p) != '<' {
 		return nil, errors.New("not parse")
 	}
-	p.read()
+	read(p)
 
-	tagName, err := p.parseString()
+	tagName, err := parseString(p)
 	if err != nil {
 		return nil, err
 	}
 	attr, err := p.parseAttr()
-	if p.peek() != '>' {
+	if peek(p) != '>' {
 		return nil, errors.New("not parse")
 	}
-	p.read()
+	read(p)
 
 	children := p.parseTextOrTags()
-	if !p.readString("</") {
+	if !readString(p, "</") {
 		return nil, errors.New("cannot parse")
 	}
 
-	endTagName, err := p.parseString()
+	endTagName, err := parseString(p)
 	if err != nil {
 		return nil, err
 	}
 	if endTagName != tagName {
 		return nil, errors.New("cannot much start/end tagname")
 	}
-	if p.peek() != '>' {
+	if peek(p) != '>' {
 		return nil, errors.New("not parse")
 	}
-	p.read()
+	read(p)
 
 	return &Node{
 		Type:     "tag",
@@ -160,25 +132,25 @@ func (p *HtmlParser) parseTag() (*Node, error) {
 func (p *HtmlParser) parseAttr() (map[string]string, error) {
 	attr := map[string]string{}
 	for {
-		p.consumeSpace()
-		attrKey, err := p.parseString()
+		consumeSpace(p)
+		attrKey, err := parseString(p)
 		if err != nil {
 			return attr, nil
 		}
-		if p.peek() != '=' {
+		if peek(p) != '=' {
 			attr[attrKey] = ""
 			continue
 		}
-		p.read()
-		if p.peek() != '"' {
+		read(p)
+		if peek(p) != '"' {
 			return map[string]string{}, errors.New("cannot parse attribute")
 		}
-		p.read()
-		attrValue, err := p.parseNotChar('"')
+		read(p)
+		attrValue, err := parseNotChar(p, '"')
 		if err != nil {
 			return map[string]string{}, err
 		}
 		attr[attrKey] = attrValue
-		p.read()
+		read(p)
 	}
 }

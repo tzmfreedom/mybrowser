@@ -7,7 +7,7 @@ import (
 func TestPeek(t *testing.T) {
 	src := "foo"
 	p := NewHtmlParser(src)
-	actual := p.peek()
+	actual := peek(p)
 	if actual != 'f' {
 		t.Errorf("expected f, actual %s", string(actual))
 	}
@@ -32,7 +32,7 @@ func TestParseNotChar(t *testing.T) {
 	}
 	for _, testCase := range testCases {
 		p := NewHtmlParser(testCase.input)
-		actual, err := p.parseNotChar('"')
+		actual, err := parseNotChar(p, '"')
 		if err != nil {
 			t.Errorf("raise error: %s", err.Error())
 		}
@@ -44,7 +44,7 @@ func TestParseNotChar(t *testing.T) {
 
 func TestConsumeSpace(t *testing.T) {
 	p := NewHtmlParser("   ")
-	p.consumeSpace()
+	consumeSpace(p)
 	if p.pos != 3 {
 		t.Errorf("expect %d, actual %d", 3, p.pos)
 	}
@@ -59,7 +59,7 @@ func TestIsEOF(t *testing.T) {
 	if isEOF(p) {
 		t.Errorf("expect %t, actual %t", false, isEOF(p))
 	}
-	p.read()
+	read(p)
 	if !isEOF(p) {
 		t.Errorf("expect %t, actual %t", true, isEOF(p))
 	}
@@ -67,7 +67,7 @@ func TestIsEOF(t *testing.T) {
 
 func TestReadString(t *testing.T) {
 	p := NewHtmlParser("</hoge>")
-	actual := p.readString("</")
+	actual := readString(p, "</")
 	if !actual {
 		t.Errorf("expect %t, actual %t", true, actual)
 	}
@@ -75,7 +75,7 @@ func TestReadString(t *testing.T) {
 		t.Errorf("expect %d, actual %d", 2, p.pos)
 	}
 	p = NewHtmlParser("//hoge>")
-	actual = p.readString("</")
+	actual = readString(p, "</")
 	if actual {
 		t.Errorf("expect %t, actual %t", false, actual)
 	}
@@ -83,7 +83,7 @@ func TestReadString(t *testing.T) {
 		t.Errorf("expect %d, actual %d", 0, p.pos)
 	}
 	p = NewHtmlParser("<<hoge>")
-	actual = p.readString("</")
+	actual = readString(p, "</")
 	if actual {
 		t.Errorf("expect %t, actual %t", false, actual)
 	}
