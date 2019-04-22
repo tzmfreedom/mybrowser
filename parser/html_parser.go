@@ -24,21 +24,48 @@ func NewHtmlParser(src string) *HtmlParser {
 	}
 }
 
+func (p *HtmlParser) GetSrc() string {
+	return p.src
+}
+
+func (p *HtmlParser) GetPos() int {
+	return p.pos
+}
+
+func (p *HtmlParser) SetPos(pos int) {
+	p.pos = pos
+}
+
 func (p *HtmlParser) Parse() (*Node, error) {
 	return p.parseTag()
 }
 
 func (p *HtmlParser) peek() byte {
-	if p.isEOF() {
-		return 0
-	}
-	return p.src[p.pos]
+	return peek(p)
 }
 
 func (p *HtmlParser) read() byte {
-	b := p.src[p.pos]
-	p.pos++
-	return b
+	return read(p)
+}
+
+func (p *HtmlParser) parseString() (string, error) {
+	return parseString(p)
+}
+
+func (p *HtmlParser) parseNotChar(b byte) (string, error) {
+	return parseNotChar(p, b)
+}
+
+func (p *HtmlParser) parseNotString(src string) (string, error) {
+	return parseNotString(p, src)
+}
+
+func (p *HtmlParser) consumeSpace() {
+	consumeSpace(p)
+}
+
+func (p *HtmlParser) readString(src string) bool {
+	return readString(p, src)
 }
 
 func (p *HtmlParser) parseTextOrTags() []*Node {
@@ -154,94 +181,4 @@ func (p *HtmlParser) parseAttr() (map[string]string, error) {
 		attr[attrKey] = attrValue
 		p.read()
 	}
-}
-
-func (p *HtmlParser) parseString() (string, error) {
-	l := p.peek()
-	if !isLetter(l) {
-		return "", errors.New("can not parse string")
-	}
-	ret := []byte{l}
-	p.read()
-	for {
-		c := p.peek()
-		if isSpace(c) {
-			break
-		}
-		if !isAlphaNumeric(c) {
-			break
-		}
-		p.read()
-		ret = append(ret, c)
-	}
-	return string(ret), nil
-}
-
-func (p *HtmlParser) parseNotChar(b byte) (string, error) {
-	l := []byte{}
-	for {
-		c := p.peek()
-		if c == b {
-			return string(l), nil
-		}
-		p.read()
-		l = append(l, c)
-	}
-}
-
-func (p *HtmlParser) parseNotString(src string) (string, error) {
-	l := []byte{}
-	for {
-		c := p.peek()
-		if containsChar(c, src) {
-			return string(l), nil
-		}
-		p.read()
-		l = append(l, c)
-	}
-}
-
-func (p *HtmlParser) consumeSpace() {
-	for p.peek() == ' ' {
-		p.read()
-	}
-}
-
-func (p *HtmlParser) readString(src string) bool {
-	for i, s := range src {
-		if p.src[p.pos+i] != byte(s) {
-			return false
-		}
-	}
-	p.pos = p.pos + len(src)
-	return true
-}
-
-func (p *HtmlParser) isEOF() bool {
-	return len(p.src) <= p.pos
-}
-
-func isAlphaNumeric(b byte) bool {
-	return isLetter(b) || isNumeric(b)
-}
-
-func isLetter(b byte) bool {
-	return (b >= 'a' && b <= 'z') || (b >= 'A' && b <= 'Z')
-}
-
-func isNumeric(b byte) bool {
-	return b >= '0' && b <= '9'
-}
-
-func isSpace(b byte) bool {
-	return b == ' '
-}
-
-func containsChar(b byte, src string) bool {
-	for _, s := range src {
-		if byte(s) == b {
-			return true
-		}
-	}
-	return false
 }
