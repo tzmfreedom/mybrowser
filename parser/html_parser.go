@@ -2,6 +2,7 @@ package parser
 
 import (
 	"errors"
+	"strings"
 )
 
 type Node struct {
@@ -10,6 +11,23 @@ type Node struct {
 	Attr     map[string]string
 	Text     string
 	Children []*Node
+}
+
+func (n *Node) BelongsToClass(class string) bool {
+	if _, ok := n.Attr["class"]; ok {
+		classes := strings.Split(strings.TrimSpace(class), " ")
+		for _, c := range classes {
+			if c == class {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func (n *Node) IsEqualID(id string) bool {
+	v, ok := n.Attr["id"]
+	return ok && v == id
 }
 
 type HtmlParser struct {

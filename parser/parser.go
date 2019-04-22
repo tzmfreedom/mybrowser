@@ -106,7 +106,7 @@ func isNumeric(b byte) bool {
 }
 
 func isSpace(b byte) bool {
-	return b == ' ' || b == '\n'
+	return b == ' ' || b == '\n' || b == '\t'
 }
 
 func containsChar(b byte, src string) bool {

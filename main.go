@@ -13,10 +13,17 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	p := parser.NewHtmlParser(string(src))
-	node, err := p.Parse()
+	htmlParser := parser.NewHtmlParser(string(src))
+	dom, err := htmlParser.Parse()
 	if err != nil {
 		panic(err)
 	}
+	cssParser := parser.NewCssParser(`
+div{
+	display: block;
+	color: red;
+}`)
+	css, err := cssParser.Parse()
+	node := parser.NewStyledNode(dom, css)
 	pp.Println(node)
 }
